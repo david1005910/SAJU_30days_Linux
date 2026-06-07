@@ -13,7 +13,6 @@
 
 [데모 보기](#demo) • [빠른 시작](#quick-start) • [문서](#documentation) • [기여하기](#contributing)
 
-> 📦 **Linux 버전 레포**: [github.com/david1005910/SAJU_30days_Linux](https://github.com/david1005910/SAJU_30days_Linux)
 
 </div>
 
