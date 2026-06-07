@@ -1,4 +1,4 @@
-# SAJU_30days - 사주공학 YouTube 자동화 시스템
+# 사주공학 — YouTube 자동화 파이프라인
 
 <div align="center">
 
@@ -9,175 +9,200 @@
 ![License](https://img.shields.io/badge/License-MIT-yellow.svg)
 [![GitHub](https://img.shields.io/badge/GitHub-SAJU__30days__Linux-181717?logo=github)](https://github.com/david1005910/SAJU_30days_Linux)
 
-**전통 사주명리학을 데이터 기반으로 해석하는 YouTube 채널 자동화 파이프라인**
+### "사주를 감(感)이 아닌 데이터로 읽는다"
 
-[데모 보기](#demo) • [빠른 시작](#quick-start) • [문서](#documentation) • [기여하기](#contributing)
+전통 사주명리학 × Claude AI × 완전 자동화 — 에피소드 한 편을 **$0.05, 버튼 한 번**으로
 
+[빠른 시작](#-빠른-시작) • [아키텍처](#-아키텍처) • [비용 분석](#-실측-비용) • [기여하기](#-기여하기)
 
 </div>
 
-## 🎯 프로젝트 소개
+---
 
-사주공학(Saju Engineering)은 전통 사주명리학을 "감(感)"이 아닌 **데이터·규칙·검증 가능한 절차**로 풀어내는 YouTube 채널의 완전 자동화 시스템입니다.
+## 왜 만들었나
 
-### 핵심 특징
+명리학은 수천 년간 축적된 동양의 패턴 데이터베이스입니다.  
+그런데 기존 사주 콘텐츠는 대부분 "느낌"으로 해석하고, AI는 그것을 그대로 환각합니다.
 
-- 🔬 **100% 결정론적 사주 계산** - AI 환각 없는 정확한 만세력 기반 계산
-- 🤖 **Claude AI 해석** - 계산된 사실만을 해석하는 안전한 AI 활용
-- 🎬 **완전 자동 영상 생성** - Remotion 기반 고품질 영상 렌더링
-- 📅 **30일 커리큘럼** - 체계적인 학습 진행 구조
-- 💰 **비용 추적** - 에피소드당 상세 비용 분석 (평균 $0.40)
-- 🚀 **1클릭 운영** - 매일 승인 버튼 한 번으로 운영 가능
+이 프로젝트는 다릅니다.
 
-## 🏗️ 시스템 아키텍처
+1. **계산은 결정론적** — 만세력 라이브러리(`sxtwl`)로 사주팔자를 수학적으로 산출, SHA-256으로 검증
+2. **해석만 AI** — 계산된 사실(일간·오행·십신)만 Claude에게 넘겨 한국어 스크립트 생성
+3. **운영은 1클릭** — 대시보드에서 승인 버튼 하나로 영상 제작~업로드 완료
+
+---
+
+## 핵심 수치 (실측)
+
+| 지표 | 값 |
+|------|-----|
+| 에피소드당 비용 | **$0.048** (Claude API 실측) |
+| 30일 전체 비용 | **$1.39** |
+| 파이프라인 단계 | **8단계** 완전 자동 |
+| 커리큘럼 | **30편** 자동 생성·승인 완료 |
+| 검증 방식 | SHA-256 해시 + ValidationGate |
+
+---
+
+## 아키텍처
 
 ```
-┌─────────────────────────────────────────┐
-│           운영자 (브라우저)               │
-└────────────────┬────────────────────────┘
-                 │
-         ┌───────▼─────────┐
-         │  Next.js 14      │  대시보드
-         └───────┬─────────┘
-                 │
-         ┌───────▼─────────┐
-         │  FastAPI         │  사주 계산 엔진
-         └───┬───────┬─────┘
-             │       │
-      ┌──────▼─┐  ┌──▼───────┐
-      │ BullMQ │  │ Claude AI │
-      └────────┘  └───────────┘
-             │
-      ┌──────▼─────────┐
-      │ Remotion → YouTube │
-      └──────────────────┘
+운영자 (브라우저)
+      │
+      ▼
+┌─────────────────┐
+│  Next.js 14     │  승인 대시보드 — 에피소드 상태·비용 실시간 표시
+└────────┬────────┘
+         │ REST API
+         ▼
+┌─────────────────┐
+│  FastAPI        │  ① 사주 계산 (결정론적)  ② Claude 해석  ③ ValidationGate
+└────────┬────────┘
+         │ Background Task
+         ▼
+┌─────────────────────────────────────────────┐
+│  8단계 파이프라인                             │
+│  계산 → 해석 → 씬분할 → TTS → 자막 → 렌더   │
+└─────────────────────────────────────────────┘
+         │
+         ▼
+  PostgreSQL + Redis   (에피소드·비용·자산 관리)
 ```
 
-## 📦 기술 스택
+---
 
-| 영역 | 기술 | 설명 |
-|------|------|------|
-| 🎯 프런트엔드 | Next.js 14 | 운영 대시보드 |
-| ⚙️ 백엔드 | FastAPI | 사주 계산 엔진 + API |
-| 🤖 AI | Claude API | 한국어 해석 생성 |
-| 📹 영상 | Remotion | React 기반 영상 렌더링 |
-| 🗣️ TTS | Edge TTS | 한국어 음성 합성 |
-| 💾 DB | PostgreSQL + Prisma | 데이터 관리 |
-| 📊 큐 | BullMQ + Redis | 파이프라인 관리 |
+## 기술 스택
 
-## 🚀 빠른 시작 {#quick-start}
+| 영역 | 기술 |
+|------|------|
+| 프런트엔드 | Next.js 14 (App Router, TypeScript) |
+| 백엔드 API | FastAPI + asyncpg |
+| 사주 계산 | sxtwl · korean-lunar-calendar |
+| AI 해석 | Claude Sonnet (Anthropic API) |
+| 음성 합성 | Edge TTS (ko-KR-SunHiNeural) |
+| 영상 렌더링 | Remotion |
+| 데이터베이스 | PostgreSQL + Prisma ORM |
+| 작업 큐 | BullMQ + Redis |
+| 패키지 관리 | pnpm workspaces · uv |
 
-### 필수 준비사항
+---
+
+## 빠른 시작
+
+### 준비물
 
 - Docker Desktop
-- Node.js 18+
-- Python 3.11+
-- Anthropic API Key
+- Node.js 18+ & pnpm
+- Python 3.11+ & uv
+- [Anthropic API Key](https://console.anthropic.com)
 
-### 설치 및 실행
+### 실행
 
 ```bash
-# 1. 저장소 클론
-git clone https://github.com/david1005910/SAJU_30days.git
-cd SAJU_30days
+# 1. 클론
+git clone https://github.com/david1005910/SAJU_30days_Linux.git
+cd SAJU_30days_Linux
 
-# 2. 환경 변수 설정
+# 2. 환경변수 설정
 cp .env.example .env
-# .env 파일에 ANTHROPIC_API_KEY 설정
+# ANTHROPIC_API_KEY 입력
 
-# 3. 시스템 시작
+# 3. 전체 시스템 시작
 ./start.sh
 
 # 4. 대시보드 접속
 open http://localhost:3000
 ```
 
-## 📚 30일 커리큘럼
-
-| 주차 | 내용 | 에피소드 |
-|------|------|----------|
-| 1주 | 기초 개념 | 사주란?, 천간지지, 오행, 일간 |
-| 2주 | 십성 이해 | 비견/겁재, 식신/상관, 편재/정재, 편관/정관, 편인/정인 |
-| 3주 | 대운과 시간 | 대운, 세운, 월운, 교운기, 신살 |
-| 4-5주 | 실전 분석 | 일간별 특성 분석 (갑목~계수) |
-
-## 🎬 8단계 파이프라인
-
-```mermaid
-graph LR
-    A[주제 선정] --> B[사주 계산]
-    B --> C[AI 해석]
-    C --> D[장면 분할]
-    D --> E[이미지 생성]
-    E --> F[TTS 생성]
-    F --> G[자막 동기화]
-    G --> H[렌더/업로드]
-```
-
-## 📊 비용 분석
-
-| 항목 | 비용 | 설명 |
-|------|------|------|
-| Claude API | ~$0.12 | 스크립트 생성 |
-| 이미지 생성 | ~$0.20 | 장면별 이미지 |
-| TTS | ~$0.05 | 한국어 음성 |
-| **총합** | **~$0.40** | 에피소드당 |
-
-## 🔒 보안 및 윤리
-
-- ✅ 결정론적 계산으로 AI 환각 방지
-- ✅ 개인정보 보호 (익명/가상 데이터만 사용)
-- ✅ 교양/엔터테인먼트 목적 명시
-- ✅ 공포 마케팅 금지
-
-## 📝 주요 명령어
+### 30일 전체 자동 생성
 
 ```bash
-# 시스템 관리
-./start.sh          # 전체 시스템 시작
-./stop.sh           # 시스템 종료
-./test-pipeline.sh  # 파이프라인 테스트
-
-# 데이터베이스
-pnpm db:studio      # Prisma Studio
-pnpm db:seed        # 샘플 데이터 생성
-
-# 개발
-pnpm dev            # 개발 서버 시작
-pnpm build          # 프로덕션 빌드
+python3 scripts/auto_pipeline.py   # 생성 → 승인 완전 자동화
 ```
 
-## 🤝 기여하기 {#contributing}
+---
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+## 8단계 파이프라인
 
-## 📜 라이선스
+```
+사주 계산  →  Claude 해석  →  씬 분할  →  이미지 생성
+                                              ↓
+YouTube ←  렌더링  ←  자막 동기화  ←  Edge TTS
+```
 
-이 프로젝트는 MIT 라이선스 하에 배포됩니다.
+각 단계는 PostgreSQL에 상태를 기록하며, 실패 시 자동 재시도합니다.
 
-## 🙏 감사의 말
+---
 
-- 전통 사주명리학 지식 제공: 한국 명리학회
-- AI 기술 지원: Anthropic Claude
-- 영상 렌더링: Remotion 팀
+## 30일 커리큘럼
 
-## 📞 문의
+| 주차 | 주제 |
+|------|------|
+| 1주차 | 사주 기초 — 천간지지, 오행, 일간 |
+| 2주차 | 십성 이해 — 비견·식신·재성·관성·인성 |
+| 3주차 | 시간과 운 — 대운, 세운, 신살 |
+| 4~5주차 | 실전 분석 — 갑목~계수 일간별 심화 |
 
-- GitHub Issues: [문제 제보](https://github.com/david1005910/SAJU_30days/issues)
-- Email: david1005910@github.com
+---
+
+## 실측 비용
+
+Claude Sonnet 기준 30편 실측값:
+
+```
+Claude 입력 토큰   $0.077  (29편 기준)
+Claude 출력 토큰   $1.309
+사주 계산 / TTS    $0.000  (무료)
+─────────────────────────
+합계               $1.386  → 편당 $0.048
+```
+
+---
+
+## 프로젝트 구조
+
+```
+.
+├── services/api/       # FastAPI — 사주 계산·Claude 해석·파이프라인
+│   ├── saju/           # 결정론적 계산 엔진
+│   └── interpret/      # Claude 클라이언트 + ValidationGate
+├── apps/
+│   ├── web/            # Next.js 운영 대시보드
+│   └── worker/         # BullMQ 파이프라인 워커
+├── packages/
+│   ├── db/             # Prisma 스키마 + 마이그레이션
+│   └── remotion/       # React 영상 컴포지션
+├── curriculum/
+│   └── 30day.yaml      # 30일 에피소드 커리큘럼
+└── infra/
+    └── docker-compose.yml
+```
+
+---
+
+## 기여하기
+
+```bash
+git checkout -b feature/이름
+git commit -m "feat: 설명"
+git push origin feature/이름
+# Pull Request 생성
+```
+
+버그 제보·아이디어는 [Issues](https://github.com/david1005910/SAJU_30days_Linux/issues)로 남겨주세요.
+
+---
+
+## 라이선스
+
+MIT © 2026 david1005910
 
 ---
 
 <div align="center">
 
-**🤖 Built with Claude Code**
+이 프로젝트가 도움이 됐다면 ⭐ Star를 눌러주세요!
 
-[⭐ Star](https://github.com/david1005910/SAJU_30days) • 
-[🐛 Issues](https://github.com/david1005910/SAJU_30days/issues) • 
-[📖 Wiki](https://github.com/david1005910/SAJU_30days/wiki)
+[⭐ Star](https://github.com/david1005910/SAJU_30days_Linux) · [🐛 Issues](https://github.com/david1005910/SAJU_30days_Linux/issues) · **Built with Claude Code**
 
 </div>
