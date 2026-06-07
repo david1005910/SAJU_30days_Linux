@@ -7,10 +7,13 @@
 ![Next.js](https://img.shields.io/badge/Next.js-14-black.svg)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.109-green.svg)
 ![License](https://img.shields.io/badge/License-MIT-yellow.svg)
+[![GitHub](https://img.shields.io/badge/GitHub-SAJU__30days__Linux-181717?logo=github)](https://github.com/david1005910/SAJU_30days_Linux)
 
 **전통 사주명리학을 데이터 기반으로 해석하는 YouTube 채널 자동화 파이프라인**
 
 [데모 보기](#demo) • [빠른 시작](#quick-start) • [문서](#documentation) • [기여하기](#contributing)
+
+> 📦 **Linux 버전 레포**: [github.com/david1005910/SAJU_30days_Linux](https://github.com/david1005910/SAJU_30days_Linux)
 
 </div>
 
